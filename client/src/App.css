@@ -1,0 +1,526 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Quicksand", sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* La imagen de fondo global de mi landing page ya está en index.css. */
+}
+
+/* El overlay oscuro y semi-transparente que cubre la imagen de fondo.
+   Ayuda a que el texto blanco resalte. */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* --- Estilos para los Mensajes de Estado (Cargando, Error, Sin Receta) --- */
+/* Estos mensajes aparecen cuando la app está cargando, hay un error, o no hay resultados. */
+.app-status-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  font-size: 1.8em;
+  color: #fff; /* Texto blanco para que se vea bien sobre el fondo oscuro. */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.4
+  ); /* Un fondo oscuro semi-transparente para el mensaje. */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  text-align: center;
+}
+
+/* Hago que el color del error sea más suave y el texto menos agresivo. */
+.error-message {
+  color: #f39c12; /* Un naranja suave, más amigable que el rojo intenso. */
+  font-weight: normal;
+  padding: 20px;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.9
+  ); /* Un fondo blanco casi opaco para que resalte sutilmente. */
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Una sombra suave para que se "levante" de la pantalla. */
+}
+/* Estilo para el botón dentro de los mensajes de estado. */
+.app-status-message .back-button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 1em;
+}
+
+/* --- Estilos para la Landing Page Inicial --- */
+.landing-page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ajustes para el título animado "Cook Today!" solo en la landing page. */
+.main-title-landing {
+  font-size: 4.5em; /* Un tamaño grande para impactar. */
+  color: #ffffff; /* Texto blanco para que resalte sobre el fondo oscuro. */
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  display: flex;
+  justify-content: center;
+  perspective: 1000px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Estilos para cada letra individual del título animado. */
+.main-title-landing .letter {
+  display: inline-block; /* Para poder animar cada letra por separado. */
+  transform: translateY(-200px) rotateZ(0deg) scale(0.5);
+  opacity: 0;
+  transition: none;
+}
+
+/* Esta clase se añade con JavaScript para disparar la animación de caída y rebote. */
+.main-title-landing .letter.animated {
+  animation: fallReboundRotate 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+    forwards; /* La clave del rebote es el cubic-bezier. */
+}
+
+/* Defino cómo se comporta la animación de caída, rebote y rotación. */
+@keyframes fallReboundRotate {
+  0% {
+    transform: translateY(-300px)
+      rotateZ(calc(var(--random-rotation-start, 0) * 1deg)) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1; /* Se vuelve visible rápido. */
+  }
+  70% {
+    transform: translateY(15px)
+      rotateZ(calc(var(--random-rotation-end, 0) * 1deg)) scale(1.05);
+  }
+  85% {
+    transform: translateY(-5px)
+      rotateZ(calc(var(--random-rotation-end, 0) * 1deg)) scale(1.02); /* Rebota hacia arriba. */
+  }
+  100% {
+    transform: translateY(0) rotateZ(0deg) scale(1); /* Se asienta en su lugar final. */
+    opacity: 1;
+  }
+}
+
+/* Estilos para el botón "Start Cooking" en la landing. */
+.start-cooking-button {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.6em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.603);
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+  margin-top: 50px;
+  animation: fadeIn 1s ease-out forwards;
+  animation-delay: 1.8s; /* Aparece después de que las letras terminan de caer. */
+  opacity: 0;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Efectos al pasar el mouse por encima del botón. */
+.start-cooking-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.653);
+}
+
+/* Animación simple para que el botón aparezca. */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+/* --- Fin Estilos Landing Page --- */
+
+/* --- Estilos para el contenedor que envuelve la página de opciones. --- */
+.options-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  animation: fadeInFromRight 0.5s ease-out forwards;
+}
+
+.options-page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.315);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  max-width: 800px;
+  padding: 40px;
+  text-align: center;
+}
+
+/* Título de la página de opciones. */
+.options-title {
+  font-size: 3em;
+  color: #262728;
+  margin-bottom: 40px;
+  font-weight: 700;
+  text-align: center;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Sección que agrupa los botones y el buscador. */
+.options-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 450px;
+}
+
+/* Estilos generales para los botones de opción. */
+.option-button {
+  color: white;
+  padding: 18px 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.4em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  margin-bottom: 20px;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Color específico para el botón de Receta Aleatoria. */
+.option-button.random-button {
+  background-color: #e67e22; /* Un naranja para diferenciarlo. */
+}
+
+.option-button.random-button:hover {
+  background-color: #d35400;
+}
+
+/* Estilo para el divisor "o" entre el botón y el buscador. */
+.option-divider {
+  font-size: 1.2em;
+  color: #1a1919;
+  margin: 15px 0;
+  text-transform: uppercase;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Estilos para el formulario de búsqueda. */
+.search-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Estilos para el campo de entrada del buscador. */
+.search-input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Efectos al hacer focus en el input. */
+.search-input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+}
+
+/* Estilos para el botón de búsqueda. */
+.search-button {
+  background-color: #3498db;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: "Quicksand", sans-serif;
+}
+
+.search-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* Animación para que la página de opciones entre suavemente desde la derecha. */
+@keyframes fadeInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- Fin Estilos para Opciones --- */
+
+/* --- Estilos para la Aplicación Principal (la vista de la receta) --- */
+/* El contenedor principal de la receta. */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px;
+  /*Fondo semi-transparente para que la imagen de fondo se siga viendo. */
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  opacity: 1;
+  animation: slideInFromTop 0.6s ease-out forwards;
+  z-index: 1;
+  position: relative;
+}
+
+.app-container.recipe-view-active {
+  padding-top: 50px;
+}
+
+/* Animación para que la vista principal de la receta se deslice desde arriba. */
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* El header de la aplicación principal (solo si lo necesito en otras vistas).
+   En la vista de receta, lo quité. */
+.app-header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 50px;
+  padding: 20px 40px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Título de la app principal (cuando no está animado). */
+.main-title-after-enter {
+  font-size: 2.5em;
+  color: #2c3e50;
+  margin-bottom: 0;
+  font-weight: 700;
+  letter-spacing: -1px;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Agrupador de botones en el header (si lo uso). */
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Estilos para el botón de "Receta Aleatoria" (si lo reutilizo en el header). */
+.random-recipe-button {
+  background-color: #3498db;
+  color: white;
+  padding: 15px 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: "Quicksand", sans-serif;
+}
+
+.random-recipe-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* La tarjeta donde se muestra la receta. */
+.recipe-card {
+  /* CAMBIO: Fondo semi-transparente para que la imagen de fondo se vea a través. */
+  background-color: rgba(255, 255, 255, 0.564);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.377);
+  padding: 40px;
+  width: 100%;
+  max-width: 750px;
+  text-align: left;
+}
+
+/* Título de la receta. */
+.recipe-title {
+  font-size: 2.8em;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Contenedor para la imagen de la receta. */
+.recipe-image-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* La imagen de la receta. */
+.recipe-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+
+/* Títulos de sección (Ingredientes, Instrucciones). */
+.section-heading {
+  font-size: 1.8em;
+  color: #34495e;
+  margin-top: 35px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 8px;
+  font-weight: 600;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Lista de ingredientes. */
+.ingredients-list {
+  list-style-type: disc;
+  padding-left: 25px;
+  margin-bottom: 30px;
+}
+
+/* Cada ítem de la lista de ingredientes. */
+.ingredients-list li {
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 8px;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Texto de las instrucciones. */
+.instructions-text {
+  line-height: 1.7;
+  font-size: 1.1em;
+  color: #444;
+  white-space: pre-wrap;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* El pie de página de la aplicación. */
+.app-footer {
+  margin-top: 40px;
+  font-size: 0.9em;
+  color: #777;
+  text-align: center;
+  width: 100%;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Estilos para el botón general de "volver". */
+.back-button {
+  background-color: #4a4a4a; /* Un gris neutro. */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9em;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: "Quicksand", sans-serif;
+}
+
+.back-button:hover {
+  background-color: #7f8c8d;
+  transform: translateY(-1px);
+}
+
+/* Ajustes específicos para el botón de "volver" cuando está en el footer. */
+.footer-back-button {
+  margin-top: 10px;
+}
