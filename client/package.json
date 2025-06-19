@@ -1,6 +1,5 @@
 {
   "name": "client",
-  "homepage": "https://samantainzerilli95.github.io/cook-today/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
