@@ -62,15 +62,10 @@ function App() {
       setLoading(true); // Indico que estoy cargando datos.
       setError(null); // Borro cualquier error anterior.
 
-      let url = "http://localhost:5000/api/recetas"; // Esta es la URL para la receta aleatoria por defecto.
+      let url = "/api/recetas"; // Si pides una receta aleatoria, solo llamas a '/api/recetas'
       if (type === "search" && term) {
-        // Si es una búsqueda, cambio la URL para que apunte a mi ruta de búsqueda en el backend.
-        // `encodeURIComponent` es para que si el usuario busca algo con espacios o símbolos, la URL se forme bien.
-        url = `http://localhost:5000/api/recetas/search?query=${encodeURIComponent(
-          term
-        )}`;
+        url = `/api/recetas/search?query=${encodeURIComponent(term)}`; // Para búsquedas, '/api/recetas/search'
       }
-
       const response = await fetch(url); // Hago la petición a mi backend.
       if (!response.ok) {
         // Si la respuesta no fue exitosa (ej. 404, 500).
